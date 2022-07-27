@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import RouteSelector from '../components/RouteSelector/RouteSelector';
 
 interface HomePageProps {
 	title?: string;
@@ -7,7 +8,7 @@ interface HomePageProps {
 const HomePage: FC<HomePageProps> = ({ title }) => {
 	return (
         <>
-            <h1>Hello React!</h1>
+            <RouteSelector></RouteSelector>
         </>
 	);
 }
