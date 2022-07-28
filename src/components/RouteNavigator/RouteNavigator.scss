@@ -1,6 +1,6 @@
 @import '../../styles/variables';
 
-.route-selector {
+.section__selector {
     background-color: rgba(31, 31, 31, 85%);
     
     .select,
@@ -9,6 +9,11 @@
     }
 }
 
-.route-display {
-    padding-top: 2rem;
+.section__tabs {
+    padding-bottom: 0;
 }
+
+.section__selector .select {
+    margin-bottom: 1rem;
+}
+
