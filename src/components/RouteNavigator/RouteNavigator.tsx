@@ -12,14 +12,19 @@ const RouteNavigator: FC<HeaderProps> = ({
     initialActiveIndex = 0
 }) => {
     const [state, setState] = useState({
+        activeRoute: routeData[0].route_label,
         activeIndex: initialActiveIndex,
 		routes: routeData,
         directions: directionData
 	});
 
+    const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+        let label = evt.target.value;
+        setState({ ...state, activeRoute: label});
+    }
+
     const selectDirection = (index: number): void => {
-        console.log('Selected Direction.');
-        setState({ ...state, activeIndex: index })
+        setState({ ...state, activeIndex: index });
     };
 
     const renderDirections = (direction: TransitDirection, index: number, activeIndex?: number): JSX.Element => {
@@ -39,7 +44,7 @@ const RouteNavigator: FC<HeaderProps> = ({
                     Select a route
                 </h2>
                 <div className="select">
-                    <select>
+                    <select onChange={selectRoute}>
                         {state.routes.map((route) => {
                             return (<option key={route.route_id}>{ route.route_label }</option>);
                         })}
@@ -47,6 +52,9 @@ const RouteNavigator: FC<HeaderProps> = ({
                 </div>
             </section>
             <section className='section route-display'>
+                <h2 className='is-size-4'>
+                    {state.activeRoute}
+                </h2>
                 <div className='tabs'>
                     <ul>
                         {state.directions.map((direction, index) => renderDirections(direction, index, state.activeIndex))}
