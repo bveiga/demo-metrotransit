@@ -50,4 +50,29 @@ describe('Components | RouteNavigator', () => {
 		fireEvent.change(routeSelect, {target: {value: middleOptionLabel}});
 		expect(routeSelect.value).toBe(middleOptionLabel);
 	});
+
+	it('can select a direction', () => {
+		const routeDisplaySection = component.getElementsByClassName('route-display')[0];
+		let directionTabs = routeDisplaySection.getElementsByTagName('li');
+		
+		expect(directionTabs[0].classList.contains('is-active')).toBe(true);
+		fireEvent.click(directionTabs[1], 1);
+		expect(directionTabs[1].classList.contains('is-active')).toBe(true);
+	});
+
+	it('can select a stop', () => {
+		
+	});
+
+	it('loads new direction tabs when route is selected', () => {
+		
+	});
+
+	it('loads new stops when direction is selected', () => {
+		
+	});
+
+	it('displays table of times for the selected stop', () => {
+		
+	});
 });
