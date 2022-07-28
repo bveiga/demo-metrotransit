@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import RouteSelector from '../components/RouteSelector/RouteSelector';
+import RouteNavigator from '../components/RouteNavigator/RouteNavigator';
 
 interface HomePageProps {
 	title?: string;
@@ -8,7 +8,7 @@ interface HomePageProps {
 const HomePage: FC<HomePageProps> = ({ title }) => {
 	return (
         <>
-            <RouteSelector></RouteSelector>
+            <RouteNavigator></RouteNavigator>
         </>
 	);
 }
