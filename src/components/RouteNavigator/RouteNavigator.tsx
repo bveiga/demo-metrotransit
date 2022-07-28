@@ -1,21 +1,25 @@
-import React, { FC, useState } from 'react';
-import { TransitRoute, TransitDirection } from '../../data/types';
+import React, { FC, useEffect, useState } from 'react';
+import { TransitDirection, TransitRoute, TransitStop } from '../../data/types';
 import './RouteNavigator.scss';
 
-import { routeData, directionData } from '../../data/sampleData';
+import { routeData, directionData, stopData } from '../../data/sampleData';
 
 interface HeaderProps {
-	initialActiveIndex?: number;
+    initialActiveStop?: number;
+	initialActiveTab?: number;
 }
 
 const RouteNavigator: FC<HeaderProps> = ({
-    initialActiveIndex = 0
+    initialActiveStop,
+    initialActiveTab = 0
 }) => {
     const [state, setState] = useState({
         activeRoute: routeData[0].route_label,
-        activeIndex: initialActiveIndex,
+        activeStop: initialActiveStop,
+        activeTab: initialActiveTab,
+        directions: directionData,
 		routes: routeData,
-        directions: directionData
+        stops: stopData
 	});
 
     const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -24,7 +28,7 @@ const RouteNavigator: FC<HeaderProps> = ({
     }
 
     const selectDirection = (index: number): void => {
-        setState({ ...state, activeIndex: index });
+        setState({ ...state, activeTab: index });
     };
 
     const renderDirections = (direction: TransitDirection, index: number, activeIndex?: number): JSX.Element => {
@@ -55,9 +59,9 @@ const RouteNavigator: FC<HeaderProps> = ({
                 <h2 className='is-size-4'>
                     {state.activeRoute}
                 </h2>
-                <div className='tabs'>
+                <div className='tabs is-toggle'>
                     <ul>
-                        {state.directions.map((direction, index) => renderDirections(direction, index, state.activeIndex))}
+                        {state.directions.map((direction, index) => renderDirections(direction, index, state.activeTab))}
                     </ul>
                 </div>
             </section>
