@@ -1,4 +1,4 @@
-export const routes = [
+export const routesData = [
 	{
 		"route_id":"901",
 		"agency_id":0,

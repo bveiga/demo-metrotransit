@@ -2,4 +2,9 @@
 
 .route-selector {
     background-color: rgba(31, 31, 31, 85%);
+    
+    .select,
+    .select select {
+        width: 100%;
+    }
 }
