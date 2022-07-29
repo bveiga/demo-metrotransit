@@ -1,6 +1,6 @@
 {
-	"name": "react-typescript-template",
-	"description": "",
+	"name": "demo-metrotransit",
+	"description": "A simple demo app to display routes and departure times for metro routes similar to metrotransit.org.",
 	"version": "0.1.0",
 	"dependencies": {
 		"bulma": "^0.9.4",
@@ -40,6 +40,7 @@
 			"^.+\\.(ts|tsx|js|jsx)$": "ts-jest"
 		}
 	},
+	"proxy": "http://localhost:5000",
 	"scripts": {
 		"start": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
