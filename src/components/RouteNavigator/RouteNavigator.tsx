@@ -137,9 +137,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 					<caption className='sr-only'>Departures Table</caption>
 					<thead>
 						<tr>
-							<th className='th-route'>Route</th>
-							<th className='th-destination'>Destination</th>
-							<th className='th-departs has-text-right'>Departs</th>
+							<th scope='col' className='th-route'>Route</th>
+							<th scope='col' className='th-destination'>Destination</th>
+							<th scope='col' className='th-departs has-text-right'>Departs</th>
 						</tr>
 					</thead>
 					<tbody>
