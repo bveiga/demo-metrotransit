@@ -6,7 +6,7 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 
-app.post('/api', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('Welcome to Bruno Veiga\'s Simple NodeJS Server. ');
 });
 

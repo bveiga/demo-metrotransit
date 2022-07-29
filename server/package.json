@@ -4,11 +4,11 @@
 	"author": "Bruno Veiga",
 	"version": "0.1.0",
 	"dependencies": {
-        "dotenv": "^16.0.1",
+		"dotenv": "^16.0.1",
 		"express": "^4.18.1",
 		"helmet": "^5.1.0"
 	},
-    "license": "MIT",
+	"license": "MIT",
 	"scripts": {
 		"start": "node app.js"
 	},
