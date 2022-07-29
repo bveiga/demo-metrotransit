@@ -22,27 +22,31 @@ describe('Components | RouteNavigator', () => {
 		expect(component).not.toBeNull();
 	});
 
-	it('renders the route selector', () => {
-		let routeSelectorSection = component.getElementsByClassName('route-selector')[0];
+	it('renders the route selector section', () => {
+		let routeSelectorSection = component.getElementsByClassName('container--route')[0];
 		expect(routeSelectorSection).not.toBeNull();
 	});
 
-	it('renders the route display', () => {
-		let routeDisplaySection = component.getElementsByClassName('route-display')[0];
+	it('renders the stop selector section', () => {
+
+	});
+
+	it('renders the display section', () => {
+		let routeDisplaySection = component.getElementsByClassName('section--display')[0];
 		expect(routeDisplaySection).not.toBeNull();
 	});
 
 	it('loads routes', () => {
-		let routeSelectorSection = component.getElementsByClassName('route-selector')[0];
-		let routeSelect = routeSelectorSection.getElementsByTagName('select')[0];
+		const routeSelectContainer = component.getElementsByClassName('container--route')[0];
+		let routeSelect = routeSelectContainer.getElementsByTagName('select')[0];
 		let options = routeSelect.getElementsByTagName('option');
 
 		expect(options.length).toBeGreaterThan(0);
 	});
 
-	it('can select a new route', () => {
-		const routeSelectorSection = component.getElementsByClassName('route-selector')[0];
-		let routeSelect = routeSelectorSection.getElementsByTagName('select')[0];
+	it('can select a route', () => {
+		const routeSelectContainer = component.getElementsByClassName('container--route')[0];
+		let routeSelect = routeSelectContainer.getElementsByTagName('select')[0];
 		let options = routeSelect.getElementsByTagName('option');
 		let middleOptionLabel = options[options.length / 2].value;
 		
@@ -51,13 +55,31 @@ describe('Components | RouteNavigator', () => {
 		expect(routeSelect.value).toBe(middleOptionLabel);
 	});
 
+	it('loads directions', () => {
+		const directionContainer = component.getElementsByClassName('container--direction')[0];
+		let directionSelect = directionContainer.getElementsByTagName('select')[0];
+		let options = directionSelect.getElementsByTagName('option');
+
+		expect(options.length).toBeGreaterThan(0);
+	});
+
 	it('can select a direction', () => {
-		const routeDisplaySection = component.getElementsByClassName('route-display')[0];
-		let directionTabs = routeDisplaySection.getElementsByTagName('li');
+		const directionContainer = component.getElementsByClassName('container--direction')[0];
+		let directionSelect = directionContainer.getElementsByTagName('select')[0];
+		let options = directionSelect.getElementsByTagName('option');
+		let middleOptionLabel = options[options.length / 2].value;
 		
-		expect(directionTabs[0].classList.contains('is-active')).toBe(true);
-		fireEvent.click(directionTabs[1], 1);
-		expect(directionTabs[1].classList.contains('is-active')).toBe(true);
+		expect(directionSelect.value).not.toBe(middleOptionLabel);
+		fireEvent.change(directionSelect, {target: {value: middleOptionLabel}});
+		expect(directionSelect.value).toBe(middleOptionLabel);
+	});
+
+	it('loads stops', () => {
+		const stopContainer = component.getElementsByClassName('container--direction')[0];
+		let stopSelect = stopContainer.getElementsByTagName('select')[0];
+		let options = stopSelect.getElementsByTagName('option');
+
+		expect(options.length).toBeGreaterThan(0);
 	});
 
 	it('can select a stop', () => {
