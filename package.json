@@ -1,6 +1,7 @@
 {
 	"name": "demo-metrotransit",
 	"description": "A simple demo app to display routes and departure times for metro routes similar to metrotransit.org.",
+	"author": "Bruno Veiga",
 	"version": "0.1.0",
 	"dependencies": {
 		"bulma": "^0.9.4",
@@ -40,10 +41,13 @@
 			"^.+\\.(ts|tsx|js|jsx)$": "ts-jest"
 		}
 	},
+	"license": "MIT",
 	"proxy": "http://localhost:5000",
 	"scripts": {
-		"start": "webpack serve --port 3000",
+		"start": "concurrently \"npm run client\" \"npm run server\"",
+		"client": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
+		"server": "cd server && npm start",
 		"test": "jest --coverage"
 	}
 }

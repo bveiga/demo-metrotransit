@@ -11,3 +11,8 @@ A simple demo app to display routes and departure times for metro routes similar
 ## Version History ##
 Version 0.1.0
 - Initial React app setup
+
+## License
+MIT
+
+See [LICENSE](LICENSE.txt) to see the full text.
