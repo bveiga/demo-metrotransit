@@ -6,45 +6,53 @@ import './RouteNavigator.scss';
 import { routeData, directionData, stopData, departureData } from '../../data/mockData';
 
 interface RouteNavigatorProps {
+	initialActiveDirection?: string;
 	initialActiveRoute?: string;
 	initialActiveStop?: string;
 	initialActiveTab?: number;
 }
 
 const RouteNavigator: FC<RouteNavigatorProps> = ({
+	initialActiveDirection,
 	initialActiveRoute,
 	initialActiveStop,
 	initialActiveTab = 0
 }) => {
 	const [state, setState] = useState({
+		activeDirection: initialActiveDirection,
 		activeRoute: initialActiveRoute || routeData[0].route_label,
 		activeStop: initialActiveStop,
 		activeTab: initialActiveTab,
+		byRoute: true,
 		departures: departureData.departures,
 		directions: directionData,
 		routes: routeData,
 		stops: stopData
 	});
 
-	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-		let label = evt.target.value;
-		setState({ ...state, activeRoute: label});
-	}
+	const tabLabels = ['By Route', 'By Stop #'];
 
-	const selectDirection = (index: number): void => {
-		setState({ ...state, activeTab: index });
+	const selectTab = (index: number): void => {
+		setState({ ...state, activeTab: index, byRoute: !state.byRoute});
+	};
+
+	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+		setState({ ...state, activeRoute: evt.target.value});
+	};
+
+	const selectDirection = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+		setState({ ...state, activeDirection: evt.target.value });
 	};
 
 	const selectStop = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-		let label = evt.target.value;
-		setState({ ...state, activeStop: label});
+		setState({ ...state, activeStop: evt.target.value});
 	};
 
-	const renderDirections = (direction: TransitDirection, index: number, activeIndex?: number): JSX.Element => {
-		const compClasses = (index === activeIndex) ? 'tab is-active' : 'tab';
+	const renderTabs = (tabLabel: string, index: number): JSX.Element => {
+		const compClasses = (index === state.activeTab) ? 'tab is-active' : 'tab';
 		return (
-			<li className={compClasses} key={index} data-id={direction.direction_id} onClick={() => selectDirection(index)}>
-				<a>{direction.direction_name}</a>
+			<li className={compClasses} key={index} onClick={() => selectTab(index)}>
+				<a>{tabLabel}</a>
 			</li>
 		);
 	};
@@ -54,7 +62,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 		let isDue = departureText.includes('Min');
 
 		return (
-			<tr className='departure'>
+			<tr className='departure' key={index}>
 				<td className='route-number'>{departure.route_short_name}</td>
 				<td className='route-name'>{departure.description}</td>
 				<td className='departure__time has-text-right'>
@@ -68,48 +76,63 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 			</tr>
 		);
 	};
-
+	
 	return (
 		<div className='route-navigator'>
-			<section className='section section__tabs'>
+			<section className='section section--tabs'>
 				<div className='tabs is-boxed'>
 					<label className='sr-only'>Select a method</label>
 					<ul>
-						{state.directions.map((direction, index) => renderDirections(direction, index, state.activeTab))}
+						{tabLabels.map((tabLabel, index)=> renderTabs(tabLabel, index))}
 					</ul>
 				</div>
 			</section>
-			<section className='section section__selector'>
-				<h1 className='title has-text-light'>Route Selector</h1>
-				<h2 className='subtitle has-text-light'>
-					Select a route, direction, and stop
-				</h2>
-				<div className="select route-select-container">
-					<label className='sr-only'>Select a route</label>
-					<select className='route-select' onChange={selectRoute}>
-						{state.routes.map((route) => {
-							return (<option key={route.route_id}>{ route.route_label }</option>);
-						})}
-					</select>
-				</div>
-				<div className="select direction-select-container">
-					<label className='sr-only'>Select a route</label>
-					<select className='route-select' onChange={selectRoute}>
-						{state.directions.map((direction) => {
-							return (<option key={direction.direction_id}>{ direction.direction_name }</option>);
-						})}
-					</select>
-				</div>
-				<div className='select stop-select-container'>
-					<label className='sr-only'>Select a stop</label>
-					<select className='stop-select' onChange={selectStop}>
-						{state.stops.map((stop) => {
-							return (<option key={stop.place_code}>{ stop.description }</option>);
-						})}
-					</select>
-				</div>
+			<section className='section section--selector'>
+				{state.byRoute &&
+					<>
+						<h1 className='title has-text-light'>Route Selector</h1>
+						<h2 className='subtitle has-text-light'>
+							Select a route, direction, and stop
+						</h2>
+						<div className="select container--route">
+							<label className='sr-only'>Select a route</label>
+							<select className='route-select' onChange={selectRoute}>
+								{state.routes.map((route) => {
+									return (<option key={route.route_id}>{ route.route_label }</option>);
+								})}
+							</select>
+						</div>
+						<div className="select container--direction">
+							<label className='sr-only'>Select a route</label>
+							<select className='route-select' onChange={selectDirection}>
+								{state.directions.map((direction) => {
+									return (<option key={direction.direction_id}>{ direction.direction_name }</option>);
+								})}
+							</select>
+						</div>
+						<div className='select container--stop'>
+							<label className='sr-only'>Select a stop</label>
+							<select className='stop-select' onChange={selectStop}>
+								{state.stops.map((stop) => {
+									return (<option key={stop.place_code}>{ stop.description }</option>);
+								})}
+							</select>
+						</div>
+					</>
+				}
+				{!state.byRoute && 
+					<>
+						<h1 className='title has-text-light'>Stop Selector</h1>
+						<h2 className='subtitle has-text-light'>
+							Type in a stop number
+						</h2>
+						<div className='control'>
+							<input className='input' type='text' placeholder='Stop #' />
+						</div>
+					</>
+				}
 			</section>
-			<section className='section section__display'>
+			<section className='section section--display'>
 				<table className='table is-fullwidth'>
 					<caption className='sr-only'>Departures Table</caption>
 					<thead>
