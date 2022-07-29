@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { Activity } from 'react-feather';
 import { TransitDirection, TransitDeparture } from '../../data/types';
 import './RouteNavigator.scss';
 
@@ -56,8 +57,12 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 			<tr className='departure'>
 				<td className='route-number'>{departure.route_short_name}</td>
 				<td className='route-name'>{departure.description}</td>
-				<td className='depart-time has-text-right'>
-					{isDue && <i className='fa-solid fa-bolt-lightning'></i>}
+				<td className='departure__time has-text-right'>
+					{isDue && 
+						<span className='icon is-blinking'>
+							<Activity />
+						</span>
+					}
 					<span>{departureText}</span>
 				</td>
 			</tr>
