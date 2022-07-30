@@ -141,24 +141,23 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 				{state.byRoute &&
 					<>
 						<h1 className='title has-text-light'>Route Selector</h1>
-						<h2 className='subtitle has-text-light'>
-							Select a route, direction, and stop
-						</h2>
-						<div className="select container--route">
-							<label className='sr-only'>Select a route</label>
-							<select className='select__route' onChange={selectRoute}>
-								{!state.activeRoute &&
-									<option key={0}>Select a Route</option>
-								}
-								{state.routes.map((route) => {
-									return (<option key={route.route_id} data-id={route.route_id}>{ route.route_label }</option>);
-								})}
-							</select>
+						<div className='control'>
+							<label className='has-text-light'>All Routes</label>
+							<div className="select container--route">
+								<select className='select__route' onChange={selectRoute} value={state.activeRoute}>
+									{!state.activeRoute &&
+										<option key={0}>Select a Route</option>
+									}
+									{state.routes.map((route) => {
+										return (<option key={route.route_id} data-id={route.route_id}>{ route.route_label }</option>);
+									})}
+								</select>
+							</div>
 						</div>
-						{state.activeRoute && 
+						<div className='control'>
+							<label className='has-text-light'>Select a direction</label>
 							<div className="select container--direction">
-								<label className='sr-only'>Select a route</label>
-								<select className='select__direction' onChange={selectDirection}>
+								<select className='select__direction' onChange={selectDirection} value={state.activeDirection}>
 									{!state.activeDirection &&
 										<option key={0}>Select a Direction</option>
 									}
@@ -167,11 +166,11 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 									})}
 								</select>
 							</div>
-						}
-						{state.activeDirection && 
+						</div>
+						<div className='control'>
+							<label className='has-text-light'>Select a stop</label>
 							<div className='select container--stop'>
-								<label className='sr-only'>Select a stop</label>
-								<select className='select__stop' onChange={selectStop}>
+								<select className='select__stop' onChange={selectStop} value={state.activeStop}>
 									{!state.activeStop &&
 										<option key={0}>Select a Stop</option>
 									}
@@ -180,7 +179,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 									})}
 								</select>
 							</div>
-						}
+						</div>
 					</>
 				}
 				{!state.byRoute && 
