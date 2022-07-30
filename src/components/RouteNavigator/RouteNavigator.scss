@@ -1,24 +1,25 @@
 @import '../../styles/variables';
 
 .section--selector {
-    background-color: rgba(31, 31, 31, 85%);
-    
-    .select {
-        margin-bottom: 1rem;
-    }
+	background-color: rgba(31, 31, 31, 85%);
+	
+	.select {
+		margin-bottom: 1rem;
+		animation: fadein .3s linear forwards;
+	}
 
-    .select,
-    .select select {
-        width: 100%;
-    }
+	.select,
+	.select select {
+		width: 100%;
+	}
 }
 
 .section--tabs {
-    padding-bottom: 0;
+	padding-bottom: 0;
 }
 
 .departure__time {
-    display: flex;
-    justify-content: flex-end;
+	display: flex;
+	justify-content: flex-end;
 }
 
