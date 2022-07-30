@@ -45,8 +45,7 @@
 	"license": "MIT",
 	"proxy": "http://localhost:5000",
 	"scripts": {
-		"start": "concurrently \"npm run client\" \"npm run server\"",
-		"client": "webpack serve --port 3000",
+		"start": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
 		"server": "cd server && npm start",
 		"test": "jest --coverage"
