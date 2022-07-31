@@ -39,6 +39,10 @@ module.exports = {
 			}
 		]
 	},
+	performance: {
+		maxAssetSize: 500000, // 500 KB
+		maxEntrypointSize: 500000
+	},
 	devtool: prod ? undefined : 'source-map',
 	plugins: [
 		new HtmlWebpackPlugin({
