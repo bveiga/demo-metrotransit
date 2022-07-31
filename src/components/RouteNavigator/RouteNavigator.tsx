@@ -46,7 +46,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 	 * Component Methods
 	 */
 	const selectTab = (index: number): void => {
-		setState({ ...state, activeTab: index, byRoute: !state.byRoute});
+		setState({ ...state, activeTab: index, byRoute: index === 0});
 	};
 	
 	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -144,7 +144,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 						<div className='control'>
 							<label>All Routes</label>
 							<div className="select container--route">
-								<select className='select__route' onChange={selectRoute} value={state.activeRoute}>
+								<select className='select__route' onChange={selectRoute}>
 									{!state.activeRoute &&
 										<option key={0}>Select a Route</option>
 									}
@@ -157,7 +157,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 						<div className='control'>
 							<label>Select a direction</label>
 							<div className="select container--direction">
-								<select className='select__direction' onChange={selectDirection} value={state.activeDirection}>
+								<select className='select__direction' onChange={selectDirection}>
 									{!state.activeDirection &&
 										<option key={0}>Select a Direction</option>
 									}
@@ -170,7 +170,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 						<div className='control'>
 							<label>Select a stop</label>
 							<div className='select container--stop'>
-								<select className='select__stop' onChange={selectStop} value={state.activeStop}>
+								<select className='select__stop' onChange={selectStop}>
 									{!state.activeStop &&
 										<option key={0}>Select a Stop</option>
 									}
