@@ -8,7 +8,10 @@ module.exports = {
 	mode: prod ? 'production' : 'development',
 	entry: './src/index.tsx',
 	output: {
+		assetModuleFilename: 'static/media/[name].[ext]',
+		filename: 'static/js/[name].js',
 		path: __dirname + '/build/',
+		clean: true
 	},
 	module: {
 		rules: [
@@ -29,13 +32,8 @@ module.exports = {
 				]
 			},
 			{
-				test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ico$/],
-				type: 'asset',
-				parser: {
-				  dataUrlCondition: {
-					maxSize: '10000',
-				  },
-				},
+				test: /\.(png|svg|jpg|jpeg|gif)$/i,
+				type: 'asset/resource',
 			}
 		]
 	},
@@ -47,7 +45,10 @@ module.exports = {
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: 'public/index.html',
+			favicon: 'public/favicon.ico'
 		}),
-		new MiniCssExtractPlugin(),
+		new MiniCssExtractPlugin({
+			filename: 'static/css/[name].css',
+		}),
 	],
 };
