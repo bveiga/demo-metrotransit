@@ -23,3 +23,13 @@
 	justify-content: flex-end;
 }
 
+.tabs.is-boxed {
+	li.is-active a {
+		background-color: #4679B0;
+		color: white;
+	}
+
+	li a {
+		border-radius: 0;
+	}
+}
