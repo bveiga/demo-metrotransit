@@ -34,6 +34,12 @@ h1, h2, h3, h4, h5, h6 {
 	animation: blinker 2s linear infinite;
 }
 
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
 @keyframes fadein {
 	0% {
 		opacity: 0;

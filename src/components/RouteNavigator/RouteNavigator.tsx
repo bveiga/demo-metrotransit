@@ -128,9 +128,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 	 * Markup
 	 */
 	return (
-		<div className='route-navigator'>
+		<div className='container route-navigator'>
 			<section className='section section--tabs'>
-				<div className='tabs is-boxed'>
+				<div className='tabs is-boxed is-medium'>
 					<label className='sr-only'>Select a method</label>
 					<ul>
 						{tabLabels.map((tabLabel, index)=> renderTabs(tabLabel, index))}
@@ -140,9 +140,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 			<section className='section section--selector'>
 				{state.byRoute &&
 					<>
-						<h1 className='title has-text-light'>Route Selector</h1>
+						<h1 className='title'>Route Selector</h1>
 						<div className='control'>
-							<label className='has-text-light'>All Routes</label>
+							<label>All Routes</label>
 							<div className="select container--route">
 								<select className='select__route' onChange={selectRoute} value={state.activeRoute}>
 									{!state.activeRoute &&
@@ -155,7 +155,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 							</div>
 						</div>
 						<div className='control'>
-							<label className='has-text-light'>Select a direction</label>
+							<label>Select a direction</label>
 							<div className="select container--direction">
 								<select className='select__direction' onChange={selectDirection} value={state.activeDirection}>
 									{!state.activeDirection &&
@@ -168,7 +168,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 							</div>
 						</div>
 						<div className='control'>
-							<label className='has-text-light'>Select a stop</label>
+							<label>Select a stop</label>
 							<div className='select container--stop'>
 								<select className='select__stop' onChange={selectStop} value={state.activeStop}>
 									{!state.activeStop &&
@@ -184,11 +184,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 				}
 				{!state.byRoute && 
 					<>
-						<h1 className='title has-text-light'>Stop Selector</h1>
-						<h2 className='subtitle has-text-light'>
-							Type in a stop number
-						</h2>
+						<h1 className='title'>Stop Selector</h1>
 						<div className='control'>
+							<label>Type in a stop number</label>
 							<input className='input' type='text' placeholder='Stop #' />
 						</div>
 					</>
