@@ -49,11 +49,11 @@ const RouteNavigator: FC = () => {
 		});
 	}, [history]);
 
-	const initialFetches = () => {
+	const initialFetches = async () => {
 		// Handle situation where route, direction, and stop are already in the url
 		if (route && direction && stop) {
 			console.log(`Data: ${route}, ${direction}, ${stop}`);
-			fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
+			await fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
 				.then((res) => res.json())
 				.then((data) => {
 					setActiveRoute('-1');
@@ -68,7 +68,7 @@ const RouteNavigator: FC = () => {
 			setActiveStop('-1');
 		}
 
-		fetch('https://svc.metrotransit.org/nextripv2/routes')
+		await fetch('https://svc.metrotransit.org/nextripv2/routes')
 			.then((res) => res.json())
 			.then((data) => {
 				setRouteList(data);
