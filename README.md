@@ -9,6 +9,7 @@ Assumptions:
 4. App can select a stop for a given route and direction
 5. App displays departures for a given stop
 6. "Show my train" functionality is not implemented
+7. Backend is not required to handle API calls since no sensitive data is transferred.
 
 ## Build
 To build this application, first install [Node JS](https://nodejs.org/). This app was tested with 14.x and 16.x versions of Node.

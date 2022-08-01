@@ -47,7 +47,6 @@
 	"scripts": {
 		"start": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
-		"server": "cd server && npm start",
 		"test": "jest --coverage"
 	}
 }
