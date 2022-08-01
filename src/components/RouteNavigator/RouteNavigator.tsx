@@ -89,8 +89,8 @@ const RouteNavigator: FC = () => {
 					}
 
 					setActiveRoute(selectedRoute);
-					setActiveDirection('');
-					setActiveStop('');
+					setActiveDirection('-1');
+					setActiveStop('-1');
 					setDirectionList(data);
 					setDepartureList([]);
 					setStopList([]);
@@ -216,7 +216,7 @@ const RouteNavigator: FC = () => {
 				)}
 			</section>
 			<section className='section section--display'>
-				{departureList.length > 0 && <DepartureDisplay departureList={departureList} stopData={stopData} />}
+				{departureList.length > 0 && activeStop !== '-1' && <DepartureDisplay departureList={departureList} stopData={stopData} />}
 				{departureList.length === 0 && activeStop !== '-1' && (<p>No available departures to display.</p>)}
 			</section>
 		</div>
