@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {act} from 'react-dom/test-utils';
 import {fireEvent} from '@testing-library/react';
-import {departureData} from '../../data/mockData';
+import {mockDepartureData, mockStopData} from '../../data/mockData';
 import DepartureDisplay from './DepartureDisplay';
 
 describe('Components | DepartureDisplay', () => {
@@ -14,7 +14,7 @@ describe('Components | DepartureDisplay', () => {
 		document.body.appendChild(container);
 
 		act(() => {
-			ReactDOM.render(<DepartureDisplay departureList={departureData.departures} />, container);
+			ReactDOM.render(<DepartureDisplay departureList={mockDepartureData.departures} stopData={mockStopData} />, container);
 			component = container.getElementsByClassName('route-navigator')[0];
 		});
 	});

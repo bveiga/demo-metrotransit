@@ -2,7 +2,7 @@ import React, {FC, useEffect, useRef, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {Activity} from 'react-feather';
 import DepartureDisplay from '../DepartureDisplay/DepartureDisplay';
-import {TransitDirection, TransitDeparture, TransitRoute, TransitStop} from '../../data/types';
+import {TransitDirection, TransitDeparture, TransitDepartureStop, TransitRoute, TransitStop} from '../../data/types';
 import './RouteNavigator.scss';
 
 interface RouteParams {
@@ -24,6 +24,7 @@ const RouteNavigator: FC = () => {
 	const [directionList, setDirectionList] = useState([] as TransitDirection[]);
 	const [stopList, setStopList] = useState([] as TransitStop[]);
 	const [departureList, setDepartureList] = useState([] as TransitDeparture[]);
+	const [stopData, setStopData] = useState({} as TransitDepartureStop);
 
 	const tabLabels = ['By Route', 'By Stop #'];
 
@@ -35,6 +36,7 @@ const RouteNavigator: FC = () => {
 				.then((res) => res.json())
 				.then((data) => {
 					setDepartureList(data.departures);
+					setStopData(data.stops[0]);
 				});
 		}
 
@@ -123,7 +125,7 @@ const RouteNavigator: FC = () => {
 						<h1 className='title'>Route Selection</h1>
 						<div className='control'>
 							<label>Routes</label>
-							<div className='select container--route'>
+							<div className='select'>
 								<select className='select__route' onChange={selectRoute}>
 									{!activeRoute && <option key={0}>Select a Route</option>}
 									{routeList.map((route) => {
@@ -138,7 +140,7 @@ const RouteNavigator: FC = () => {
 						</div>
 						<div className='control'>
 							<label>Directions</label>
-							<div className='select container--direction'>
+							<div className='select'>
 								<select className='select__direction' onChange={selectDirection}>
 									{!activeDirection && <option key={0}>Select a Direction</option>}
 									{directionList.map((direction) => {
@@ -153,7 +155,7 @@ const RouteNavigator: FC = () => {
 						</div>
 						<div className='control'>
 							<label>Stops</label>
-							<div className='select container--stop'>
+							<div className='select'>
 								<select className='select__stop' onChange={selectStop}>
 									{!activeStop && <option key={0}>Select a Stop</option>}
 									{stopList.map((stop) => {
@@ -179,7 +181,7 @@ const RouteNavigator: FC = () => {
 				)}
 			</section>
 			<section className='section section--display'>
-				{departureList.length > 0 && <DepartureDisplay departureList={departureList} />}
+				{departureList.length > 0 && <DepartureDisplay departureList={departureList} stopData={stopData} />}
 			</section>
 		</div>
 	);

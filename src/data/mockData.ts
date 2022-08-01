@@ -1,4 +1,4 @@
-export const routeData = [
+export const mockRouteList = [
 	{
 		route_id: '901',
 		agency_id: 0,
@@ -31,7 +31,7 @@ export const routeData = [
 	},
 ];
 
-export const directionData = [
+export const mockDirectionList = [
 	{
 		direction_id: 0,
 		direction_name: 'Northbound',
@@ -42,7 +42,7 @@ export const directionData = [
 	},
 ];
 
-export const stopData = [
+export const mockStopList = [
 	{
 		place_code: 'HHTE',
 		description: 'MSP Airport Terminal 2 - Humphrey Station',
@@ -57,7 +57,7 @@ export const stopData = [
 	},
 ];
 
-export const departureData = {
+export const mockDepartureData = {
 	stops: [
 		{
 			stop_id: 51435,
@@ -108,4 +108,11 @@ export const departureData = {
 			schedule_relationship: 'Scheduled',
 		},
 	],
+};
+
+export const mockStopData = {
+	stop_id: 51435,
+	latitude: 44.874119,
+	longitude: -93.224068,
+	description: 'Terminal 2 Humphrey Station',
 };

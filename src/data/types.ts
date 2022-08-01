@@ -27,3 +27,10 @@ export interface TransitDeparture {
 	direction_text: string;
 	schedule_relationship: string;
 }
+
+export interface TransitDepartureStop {
+	stop_id: number;
+	latitude: number;
+	longitude: number;
+	description: string;
+}
