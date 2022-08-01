@@ -3,8 +3,6 @@ import { Activity } from 'react-feather';
 import { TransitDirection, TransitDeparture, TransitRoute, TransitStop } from '../../data/types';
 import './RouteNavigator.scss';
 
-import { routeData, directionData, stopData, departureData } from '../../data/mockData';
-
 interface RouteNavigatorProps {
 	initialActiveDirection?: string;
 	initialActiveRoute?: string;
@@ -18,85 +16,75 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 	initialActiveStop,
 	initialActiveTab
 }) => {
-	const [state, setState] = useState({
-		activeDirection: '',
-		activeRoute: '',
-		activeStop: '',
-		activeTab: 0,
-		byRoute: true,
-		departures: [] as TransitDeparture[],
-		directions: [] as TransitDirection[],
-		routes: [] as TransitRoute[],
-		stops: [] as TransitStop[]
-	});
+	const [activeTab, setActiveTab] = useState(0);
+	const [activeRoute, setActiveRoute] = useState('');
+	const [activeDirection, setActiveDirection] = useState('');
+	const [activeStop, setActiveStop] = useState('');
+	
+	const [routeList, setRouteList] = useState([] as TransitRoute[]);
+	const [directionList, setDirectionList] = useState([] as TransitDirection[]);
+	const [stopList, setStopList] = useState([] as TransitStop[]);
+	const [departureList, setDepartureList] = useState([] as TransitDeparture[]);
+	
 	const tabLabels = ['By Route', 'By Stop #'];
 
 	/**
-	 * External Data
+	 * Fetch Data
 	 */
 	useEffect(() => {
 		fetch("https://svc.metrotransit.org/nextripv2/routes")
 			.then((res) => res.json())
 			.then((data) => {
-				setState({...state, routes: data});
+				setRouteList(data);
 			});
 	}, []);
-
-	/**
-	 * Component Methods
-	 */
-	const selectTab = (index: number): void => {
-		setState({ ...state, activeTab: index, byRoute: index === 0});
-	};
 	
 	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
 		let selectedIndex = evt.target.options.selectedIndex;
-		let activeRoute = evt.target.options[selectedIndex].getAttribute('data-id') || '';
+		let selectedRoute = evt.target.options[selectedIndex].getAttribute('data-id') || '';
 
-		fetch(`https://svc.metrotransit.org/nextripv2/Directions/${activeRoute}`)
+		fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
 			.then((res) => res.json())
 			.then((data) => {
-				setState({...state,
-					activeRoute: activeRoute, 
-					activeDirection: '', 
-					activeStop: '',
-					departures: [],
-					directions: data,
-					stops: []
-				});
+				setActiveRoute(selectedRoute);
+				setActiveDirection('');
+				setActiveStop('');
+				setDepartureList([]);
+				setDirectionList(data);
+				setStopList([]);
 			});
 	};
 
 	const selectDirection = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
 		let selectedIndex = evt.target.options.selectedIndex;
-		let activeDirection = evt.target.options[selectedIndex].getAttribute('data-id') || '';
+		let selectedDirection = evt.target.options[selectedIndex].getAttribute('data-id') || '';
 
-		fetch(`https://svc.metrotransit.org/nextripv2/Stops/${state.activeRoute}/${activeDirection}`)
+		fetch(`https://svc.metrotransit.org/nextripv2/Stops/${activeRoute}/${selectedDirection}`)
 			.then((res) => res.json())
 			.then((data) => {
-				setState({...state,
-					activeDirection: activeDirection,
-					stops: data
-				});
+				setActiveDirection(selectedDirection);
+				setStopList(data);
 			});
 	};
 
 	const selectStop = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
 		let selectedIndex = evt.target.options.selectedIndex;
-		let activeStop = evt.target.options[selectedIndex].getAttribute('data-id') || '';
+		let selectedStop = evt.target.options[selectedIndex].getAttribute('data-id') || '';
 
-		fetch(`https://svc.metrotransit.org/nextripv2/${state.activeRoute}/${state.activeDirection}/${activeStop}`)
+		fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
 			.then((res) => res.json())
 			.then((data) => {
-				setState({...state,
-					activeStop: activeStop,
-					departures: data.departures
-				});
+				setActiveStop(selectedStop);
+				setDepartureList(data.departures);
 			});
 	};
 
+	const selectTab = (index: number): void => {
+		setActiveTab(index);
+	};
+	
 	const renderTabs = (tabLabel: string, index: number): JSX.Element => {
-		const compClasses = (index === state.activeTab) ? 'tab is-active' : 'tab';
+		const compClasses = (index === activeTab) ? 'tab is-active' : 'tab';
 		return (
 			<li className={compClasses} key={index} onClick={() => selectTab(index)}>
 				<a>{tabLabel}</a>
@@ -138,43 +126,43 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 				</div>
 			</section>
 			<section className='section section--selector'>
-				{state.byRoute &&
+				{!activeTab &&
 					<>
 						<h1 className='title'>Route Selector</h1>
 						<div className='control'>
-							<label>All Routes</label>
+							<label>Routes</label>
 							<div className="select container--route">
 								<select className='select__route' onChange={selectRoute}>
-									{!state.activeRoute &&
+									{!activeRoute &&
 										<option key={0}>Select a Route</option>
 									}
-									{state.routes.map((route) => {
+									{routeList.map((route) => {
 										return (<option key={route.route_id} data-id={route.route_id}>{ route.route_label }</option>);
 									})}
 								</select>
 							</div>
 						</div>
 						<div className='control'>
-							<label>Select a direction</label>
+							<label>Directions</label>
 							<div className="select container--direction">
 								<select className='select__direction' onChange={selectDirection}>
-									{!state.activeDirection &&
+									{!activeDirection &&
 										<option key={0}>Select a Direction</option>
 									}
-									{state.directions.map((direction) => {
+									{directionList.map((direction) => {
 										return (<option key={direction.direction_id} data-id={direction.direction_id}>{ direction.direction_name }</option>);
 									})}
 								</select>
 							</div>
 						</div>
 						<div className='control'>
-							<label>Select a stop</label>
+							<label>Stops</label>
 							<div className='select container--stop'>
 								<select className='select__stop' onChange={selectStop}>
-									{!state.activeStop &&
+									{!activeStop &&
 										<option key={0}>Select a Stop</option>
 									}
-									{state.stops.map((stop) => {
+									{stopList.map((stop) => {
 										return (<option key={stop.place_code} data-id={stop.place_code}>{ stop.description }</option>);
 									})}
 								</select>
@@ -182,7 +170,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 						</div>
 					</>
 				}
-				{!state.byRoute && 
+				{activeTab === 1 && 
 					<>
 						<h1 className='title'>Stop Selector</h1>
 						<div className='control'>
@@ -193,7 +181,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 				}
 			</section>
 			<section className='section section--display'>
-				{state.departures.length > 0 && 
+				{departureList.length > 0 && 
 					<table className='table is-fullwidth'>
 						<caption className='sr-only'>Departures Table</caption>
 						<thead>
@@ -204,7 +192,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 							</tr>
 						</thead>
 						<tbody>
-							{state.departures.map((departure, index) => renderDepartures(departure, index))}
+							{departureList.map((departure, index) => renderDepartures(departure, index))}
 						</tbody>
 					</table>
 				}
