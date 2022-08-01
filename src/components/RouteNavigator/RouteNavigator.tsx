@@ -57,6 +57,7 @@ const RouteNavigator: FC = () => {
 				.then((res) => res.json())
 				.then((data) => {
 					setActiveRoute('-1');
+					setActiveStop(stop);
 					setDirectionList([]);
 					setStopList([]);
 					setDepartureList(data.departures);
@@ -217,7 +218,6 @@ const RouteNavigator: FC = () => {
 			</section>
 			<section className='section section--display'>
 				{departureList.length > 0 && activeStop !== '-1' && <DepartureDisplay departureList={departureList} stopData={stopData} />}
-				{departureList.length === 0 && activeStop !== '-1' && (<p>No available departures to display.</p>)}
 			</section>
 		</div>
 	);
