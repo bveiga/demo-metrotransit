@@ -48,6 +48,7 @@
 	"scripts": {
 		"start": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
+		"build-windows": "SET NODE_ENV=production & webpack",
 		"test": "jest --coverage"
 	}
 }

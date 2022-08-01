@@ -19,10 +19,17 @@ From within the app directory, install dependencies with NPM:
 $ npm install
 ```
 
-Then, run the following to build the application:
+Next, if you're on a Linux or Unix machine, run this:
 ```
 $ npm run build
 ```
+
+If you're on a windows machine, run this instead:
+```
+$ npm run build-windows
+```
+
+This will build your application for production and output the resulting files in the `build` directory.
 
 ## Run
 To run this application locally:
