@@ -1,0 +1,10 @@
+{
+	"bracketSpacing": false,
+	"jsxSingleQuote": true,
+	"printWidth": 120,
+	"proseWrap": "preserve",
+	"singleAttributePerLine": false,
+	"singleQuote": true,
+	"tabWidth": 4,
+	"useTabs": true
+}

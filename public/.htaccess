@@ -1,0 +1,14 @@
+# ------------------------------------------------------------------------------
+# Routing Fix for React                                                        |
+# ------------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+  # Options +SymLinksIfOwnerMatch
+    RewriteEngine On
+    RewriteBase     /
+    RewriteCond     %{REQUEST_URI} !^(/index\.php|/img|/js|/css|/robots\.txt|/favicon\.ico|/api)
+    RewriteCond     %{REQUEST_FILENAME} !-f
+    RewriteCond     %{REQUEST_FILENAME} !-d
+    RewriteRule     .               /index.html              [L]
+</IfModule>

@@ -1,31 +1,56 @@
 {
-	"name": "react-typescript-template",
-	"description": "",
+	"name": "demo-metrotransit",
+	"description": "A simple demo app to display routes and departure times for metro routes similar to metrotransit.org.",
+	"author": "Bruno Veiga",
 	"version": "0.1.0",
 	"dependencies": {
+		"bulma": "^0.9.4",
 		"react": "^17.0.0",
 		"react-dom": "^17.0.0",
+		"react-feather": "^2.0.10",
 		"react-router-dom": "^5.2.0"
 	},
 	"devDependencies": {
+		"@testing-library/react": "^12.1.5",
+		"@types/jest": "^28.1.6",
 		"@types/react": "^18.0.15",
 		"@types/react-dom": "^18.0.6",
 		"@types/react-router-dom": "^5.1.5",
+		"concurrently": "^7.3.0",
+		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.7.1",
 		"html-webpack-plugin": "^5.5.0",
+		"jest": "^28.1.3",
+		"jest-environment-jsdom": "^28.1.3",
 		"mini-css-extract-plugin": "^2.6.1",
+		"nock": "^13.2.9",
 		"sass": "^1.54.0",
 		"sass-loader": "^13.0.2",
 		"style-loader": "^3.3.1",
+		"ts-jest": "^28.0.7",
 		"ts-loader": "^9.3.1",
 		"typescript": "^4.7.4",
 		"webpack": "^5.74.0",
 		"webpack-cli": "^4.10.0",
-		"webpack-dev-server": "^4.9.3"
+		"webpack-dev-server": "^4.9.3",
+		"whatwg-fetch": "^3.6.2"
 	},
+	"jest": {
+		"moduleNameMapper": {
+			"\\.(css|less|sass|scss)$": "<rootDir>/src/data/mockStyle.ts",
+			"\\.(jpg|jpeg|png|gif|webp|svg|eot|otf|ttf)$": "<rootDir>/src/data/mockFile.ts"
+		},
+		"testEnvironment": "jsdom",
+		"transform": {
+			"^.+\\.(ts|tsx|js|jsx)$": "ts-jest"
+		}
+	},
+	"license": "MIT",
+	"proxy": "http://localhost:5000",
 	"scripts": {
 		"start": "webpack serve --port 3000",
 		"build": "NODE_ENV=production webpack",
-		"test": "echo \"No Tests\""
+		"build-windows": "SET NODE_ENV=production & webpack",
+		"test": "jest --coverage"
 	}
 }

@@ -1,17 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
-import HomePage from './pages/HomePage';
-import './styles/index.scss'
+import './styles/index.scss';
+import Footer from './components/Footer/Footer';
+import RouteNavigator from './components/RouteNavigator/RouteNavigator';
 
+const currentYear: number = new Date().getFullYear();
 ReactDOM.render(
-    <React.StrictMode>
+	<React.StrictMode>
 		<BrowserRouter>
-            <Switch>
-				<Route path='/' exact component={HomePage} />
-            </Switch>
-        </BrowserRouter>
-    </React.StrictMode>,
-    document.getElementById('app-root')
-)
+			<Switch>
+				<Route path='/' exact component={RouteNavigator} />
+				<Route path='/:route/:direction/:stop' component={RouteNavigator} />
+			</Switch>
+			<Footer copyrightInfo={`Copyright © ${currentYear} All Rights Reserved | Dev & Design by Bruno Veiga`} />
+		</BrowserRouter>
+	</React.StrictMode>,
+	document.getElementById('app-root')
+);

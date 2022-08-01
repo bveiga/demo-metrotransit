@@ -1,0 +1,39 @@
+@import '../../styles/variables';
+
+.section--selector {
+	background-color: #edf4fc;
+	border: 1px solid #537da9;
+
+	.control {
+		animation: fadein .3s linear forwards;
+	}
+
+	.select {
+		margin-bottom: 1rem;
+	}
+
+	.select,
+	.select select {
+		width: 100%;
+	}
+}
+
+.section--tabs {
+	padding-bottom: 0;
+}
+
+.departure__time {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.tabs.is-boxed {
+	li.is-active a {
+		background-color: #4679b0;
+		color: white;
+	}
+
+	li a {
+		border-radius: 0;
+	}
+}
