@@ -93,8 +93,4 @@ describe('Components | RouteNavigator', () => {
 	it('loads new stops when direction is selected', () => {
 		
 	});
-
-	it('displays table of times for the selected stop', () => {
-		
-	});
 });

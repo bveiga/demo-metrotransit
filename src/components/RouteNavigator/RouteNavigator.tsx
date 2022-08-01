@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from "react-router-dom";
 import { Activity } from 'react-feather';
+import DepartureDisplay from '../DepartureDisplay/DepartureDisplay';
 import { TransitDirection, TransitDeparture, TransitRoute, TransitStop } from '../../data/types';
 import './RouteNavigator.scss';
 
@@ -96,35 +97,12 @@ const RouteNavigator: FC = () => {
 		setActiveTab(index);
 	};
 	
-	/**
-	 * Rendering partials
-	 */
 	const renderTabs = (tabLabel: string, index: number): JSX.Element => {
 		const compClasses = (index === activeTab) ? 'tab is-active' : 'tab';
 		return (
 			<li className={compClasses} key={index} onClick={() => selectTab(index)}>
 				<a>{tabLabel}</a>
 			</li>
-		);
-	};
-
-	const renderDepartures = (departure: TransitDeparture, index: number): JSX.Element => {
-		let departureText = departure.departure_text;
-		let isDue = departureText.includes('Min') || departureText.includes('Due');
-
-		return (
-			<tr className='departure' key={index}>
-				<td className='route-number'>{departure.route_short_name}</td>
-				<td className='route-name'>{departure.description}</td>
-				<td className='departure__time has-text-right'>
-					{isDue && 
-						<span className='icon is-blinking'>
-							<Activity />
-						</span>
-					}
-					<span>{departureText}</span>
-				</td>
-			</tr>
 		);
 	};
 	
@@ -197,21 +175,7 @@ const RouteNavigator: FC = () => {
 				}
 			</section>
 			<section className='section section--display'>
-				{departureList.length > 0 && 
-					<table className='table is-fullwidth'>
-						<caption className='sr-only'>Departures Table</caption>
-						<thead>
-							<tr>
-								<th scope='col' className='th-route'>Route</th>
-								<th scope='col' className='th-destination'>Destination</th>
-								<th scope='col' className='th-departs has-text-right'>Departs</th>
-							</tr>
-						</thead>
-						<tbody>
-							{departureList.map((departure, index) => renderDepartures(departure, index))}
-						</tbody>
-					</table>
-				}
+				{departureList.length > 0 && <DepartureDisplay departureList={departureList} />}
 			</section>
 		</div>
 	);
