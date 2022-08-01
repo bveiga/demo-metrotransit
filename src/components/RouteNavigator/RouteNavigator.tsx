@@ -1,6 +1,5 @@
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import {Activity} from 'react-feather';
 import DepartureDisplay from '../DepartureDisplay/DepartureDisplay';
 import {TransitDirection, TransitDeparture, TransitDepartureStop, TransitRoute, TransitStop} from '../../data/types';
 import './RouteNavigator.scss';
@@ -16,7 +15,7 @@ const RouteNavigator: FC = () => {
 	let {route, direction, stop} = useParams<RouteParams>();
 
 	const [activeTab, setActiveTab] = useState(0);
-	const [activeRoute, setActiveRoute] = useState('');
+	const [activeRoute, setActiveRoute] = useState('-1');
 	const [activeDirection, setActiveDirection] = useState('');
 	const [activeStop, setActiveStop] = useState('');
 
@@ -29,13 +28,14 @@ const RouteNavigator: FC = () => {
 	const tabLabels = ['By Route', 'By Stop #'];
 
 	useEffect(() => {
-		fetchDepartures();
+		initialFetches();
 
+		// Handle back and forward buttons
 		return history.listen((location) => {
 			if (history.action === 'POP') {
 				let paramsArray = location.pathname.split('/');
 
-				if(paramsArray.length < 4) {
+				if(paramsArray.length !== 4) {
 					route = '';
 					direction = '';
 					stop = '';
@@ -44,82 +44,86 @@ const RouteNavigator: FC = () => {
 					direction = paramsArray[2];
 					stop = paramsArray[3];
 				}
-				fetchDepartures();
+				initialFetches();
 			}
 		});
 	}, [history]);
 
-
-	const fetchDepartures = () => {
+	const initialFetches = () => {
 		// Handle situation where route, direction, and stop are already in the url
 		if (route && direction && stop) {
 			console.log(`Data: ${route}, ${direction}, ${stop}`);
 			fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
 				.then((res) => res.json())
 				.then((data) => {
-					setActiveStop(stop);
+					setActiveRoute('-1');
+					setDirectionList([]);
+					setStopList([]);
 					setDepartureList(data.departures);
 					setStopData(data.stops[0]);
 				});
 		} else {
-			fetch('https://svc.metrotransit.org/nextripv2/routes')
+			setActiveRoute('-1');
+			setActiveDirection('-1');
+			setActiveStop('-1');
+		}
+
+		fetch('https://svc.metrotransit.org/nextripv2/routes')
 			.then((res) => res.json())
 			.then((data) => {
 				setRouteList(data);
-				setActiveRoute('');
-				setActiveDirection('');
-				setActiveStop('');
 			});
-		}
 	};
 
 	/**
 	 * Event Handlers
 	 */
 	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-		let selectedIndex = evt.target.options.selectedIndex;
-		let selectedRoute = evt.target.options[selectedIndex].getAttribute('data-id') || '';
+		let selectedRoute = evt.target.value;
+		if(selectedRoute !== '-1') {
+			fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
+				.then((res) => res.json())
+				.then((data) => {
+					if (history.location.pathname !== '/') {
+						history.push('/');
+					}
 
-		fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
-			.then((res) => res.json())
-			.then((data) => {
-				if (history.location.pathname !== '/') {
-					history.push('/');
-				}
-
-				setActiveRoute(selectedRoute);
-				setActiveDirection('');
-				setActiveStop('');
-				setDepartureList([]);
-				setDirectionList(data);
-				setStopList([]);
-			});
+					setActiveRoute(selectedRoute);
+					setActiveDirection('');
+					setActiveStop('');
+					setDirectionList(data);
+					setDepartureList([]);
+					setStopList([]);
+				});
+		}
 	};
 
 	const selectDirection = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-		let selectedIndex = evt.target.options.selectedIndex;
-		let selectedDirection = evt.target.options[selectedIndex].getAttribute('data-id') || '';
-
-		fetch(`https://svc.metrotransit.org/nextripv2/Stops/${activeRoute}/${selectedDirection}`)
-			.then((res) => res.json())
-			.then((data) => {
-				setActiveDirection(selectedDirection);
-				setStopList(data);
-			});
+		let selectedDirection = evt.target.value;
+		if(selectedDirection !== '-1') {
+			fetch(`https://svc.metrotransit.org/nextripv2/Stops/${activeRoute}/${selectedDirection}`)
+				.then((res) => res.json())
+				.then((data) => {
+					setActiveDirection(selectedDirection);
+					setStopList(data);
+				});
+		}
 	};
 
 	const selectStop = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-		let selectedIndex = evt.target.options.selectedIndex;
-		let selectedStop = evt.target.options[selectedIndex].getAttribute('data-id') || '';
+		let selectedStop = evt.target.value;
+		console.log(selectedStop);
 
-		fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
-			.then((res) => res.json())
-			.then((data) => {
-				history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
-				setActiveStop(selectedStop);
-				setDepartureList(data.departures);
-				setStopData(data.stops[0]);
-			});
+		if(selectedStop !== '-1') {
+			fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
+				.then((res) => res.json())
+				.then((data) => {
+					history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
+					setActiveStop(selectedStop);
+					setDepartureList(data.departures);
+					setStopData(data.stops[0]);
+				});
+		}
 	};
 
 	const selectTab = (index: number): void => {
@@ -153,11 +157,11 @@ const RouteNavigator: FC = () => {
 						<div className='control'>
 							<label>Routes</label>
 							<div className='select'>
-								<select className='select__route' onChange={selectRoute}>
-									{!activeRoute && <option key={0}>Select a Route</option>}
+								<select className='select__route' onChange={selectRoute} value={activeRoute}>
+									<option key={0} value='-1'>Select a Route</option>
 									{routeList.map((route) => {
 										return (
-											<option key={route.route_id} data-id={route.route_id}>
+											<option key={route.route_id} value={route.route_id}>
 												{route.route_label}
 											</option>
 										);
@@ -165,15 +169,15 @@ const RouteNavigator: FC = () => {
 								</select>
 							</div>
 						</div>
-						{activeRoute && directionList && (
+						{activeRoute && directionList.length > 0 && (
 							<div className='control'>
 								<label>Directions</label>
 								<div className='select'>
-									<select className='select__direction' onChange={selectDirection}>
-										{!activeDirection && <option key={0}>Select a Direction</option>}
+									<select className='select__direction' onChange={selectDirection} value={activeDirection}>
+										<option key={0} value='-1'>Select a Direction</option>
 										{directionList.map((direction) => {
 											return (
-												<option key={direction.direction_id} data-id={direction.direction_id}>
+												<option key={direction.direction_id} value={direction.direction_id}>
 													{direction.direction_name}
 												</option>
 											);
@@ -182,15 +186,15 @@ const RouteNavigator: FC = () => {
 								</div>
 							</div>
 						)}
-						{activeDirection && stopList && (
+						{activeDirection && stopList.length > 0 && (
 							<div className='control'>
 								<label>Stops</label>
 								<div className='select'>
-									<select className='select__stop' onChange={selectStop}>
-										{!activeStop && <option key={0}>Select a Stop</option>}
+									<select className='select__stop' onChange={selectStop} value={activeStop}>
+										<option key={0} value='-1'>Select a Stop</option>
 										{stopList.map((stop) => {
 											return (
-												<option key={stop.place_code} data-id={stop.place_code}>
+												<option key={stop.place_code} value={stop.place_code}>
 													{stop.description}
 												</option>
 											);
@@ -213,7 +217,7 @@ const RouteNavigator: FC = () => {
 			</section>
 			<section className='section section--display'>
 				{departureList.length > 0 && <DepartureDisplay departureList={departureList} stopData={stopData} />}
-				{departureList.length === 0 && activeStop && (<p>No available departures to display.</p>)}
+				{departureList.length === 0 && activeStop !== '-1' && (<p>No available departures to display.</p>)}
 			</section>
 		</div>
 	);
