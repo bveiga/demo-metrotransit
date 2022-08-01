@@ -4,6 +4,10 @@
 	background-color: #edf4fc;
 	border: 1px solid #537da9;
 
+	.control {
+		animation: fadein .3s linear forwards;
+	}
+
 	.select {
 		margin-bottom: 1rem;
 	}

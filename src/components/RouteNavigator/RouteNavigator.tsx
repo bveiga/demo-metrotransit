@@ -13,7 +13,7 @@ interface RouteParams {
 
 const RouteNavigator: FC = () => {
 	let history = useHistory();
-	const {route, direction, stop} = useParams<RouteParams>();
+	let {route, direction, stop} = useParams<RouteParams>();
 
 	const [activeTab, setActiveTab] = useState(0);
 	const [activeRoute, setActiveRoute] = useState('');
@@ -29,23 +29,49 @@ const RouteNavigator: FC = () => {
 	const tabLabels = ['By Route', 'By Stop #'];
 
 	useEffect(() => {
+		fetchDepartures();
+
+		return history.listen((location) => {
+			if (history.action === 'POP') {
+				let paramsArray = location.pathname.split('/');
+
+				if(paramsArray.length < 4) {
+					route = '';
+					direction = '';
+					stop = '';
+				} else {
+					route = paramsArray[1];
+					direction = paramsArray[2];
+					stop = paramsArray[3];
+				}
+				fetchDepartures();
+			}
+		});
+	}, [history]);
+
+
+	const fetchDepartures = () => {
 		// Handle situation where route, direction, and stop are already in the url
 		if (route && direction && stop) {
 			console.log(`Data: ${route}, ${direction}, ${stop}`);
 			fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
 				.then((res) => res.json())
 				.then((data) => {
+					setActiveStop(stop);
 					setDepartureList(data.departures);
 					setStopData(data.stops[0]);
 				});
-		}
-
-		fetch('https://svc.metrotransit.org/nextripv2/routes')
+		} else {
+			fetch('https://svc.metrotransit.org/nextripv2/routes')
 			.then((res) => res.json())
 			.then((data) => {
 				setRouteList(data);
+				setActiveRoute('');
+				setActiveDirection('');
+				setActiveStop('');
 			});
-	}, []);
+		}
+	};
 
 	/**
 	 * Event Handlers
@@ -92,6 +118,7 @@ const RouteNavigator: FC = () => {
 				history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
 				setActiveStop(selectedStop);
 				setDepartureList(data.departures);
+				setStopData(data.stops[0]);
 			});
 	};
 
@@ -138,36 +165,40 @@ const RouteNavigator: FC = () => {
 								</select>
 							</div>
 						</div>
-						<div className='control'>
-							<label>Directions</label>
-							<div className='select'>
-								<select className='select__direction' onChange={selectDirection}>
-									{!activeDirection && <option key={0}>Select a Direction</option>}
-									{directionList.map((direction) => {
-										return (
-											<option key={direction.direction_id} data-id={direction.direction_id}>
-												{direction.direction_name}
-											</option>
-										);
-									})}
-								</select>
+						{activeRoute && directionList && (
+							<div className='control'>
+								<label>Directions</label>
+								<div className='select'>
+									<select className='select__direction' onChange={selectDirection}>
+										{!activeDirection && <option key={0}>Select a Direction</option>}
+										{directionList.map((direction) => {
+											return (
+												<option key={direction.direction_id} data-id={direction.direction_id}>
+													{direction.direction_name}
+												</option>
+											);
+										})}
+									</select>
+								</div>
 							</div>
-						</div>
-						<div className='control'>
-							<label>Stops</label>
-							<div className='select'>
-								<select className='select__stop' onChange={selectStop}>
-									{!activeStop && <option key={0}>Select a Stop</option>}
-									{stopList.map((stop) => {
-										return (
-											<option key={stop.place_code} data-id={stop.place_code}>
-												{stop.description}
-											</option>
-										);
-									})}
-								</select>
+						)}
+						{activeDirection && stopList && (
+							<div className='control'>
+								<label>Stops</label>
+								<div className='select'>
+									<select className='select__stop' onChange={selectStop}>
+										{!activeStop && <option key={0}>Select a Stop</option>}
+										{stopList.map((stop) => {
+											return (
+												<option key={stop.place_code} data-id={stop.place_code}>
+													{stop.description}
+												</option>
+											);
+										})}
+									</select>
+								</div>
 							</div>
-						</div>
+						)}
 					</>
 				)}
 				{activeTab === 1 && (
@@ -182,6 +213,7 @@ const RouteNavigator: FC = () => {
 			</section>
 			<section className='section section--display'>
 				{departureList.length > 0 && <DepartureDisplay departureList={departureList} stopData={stopData} />}
+				{departureList.length === 0 && activeStop && (<p>No available departures to display.</p>)}
 			</section>
 		</div>
 	);
