@@ -1,7 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import {act} from 'react-dom/test-utils';
-import { TransitDirection, TransitRoute, TransitStop } from '../../data/types';
+import {TransitDirection, TransitRoute, TransitStop} from '../../data/types';
 import Footer from './Footer';
 
 describe('Components | Footer', () => {
@@ -9,9 +9,9 @@ describe('Components | Footer', () => {
 	beforeAll(() => {
 		container = document.createElement('div');
 		document.body.appendChild(container);
-		
+
 		act(() => {
-			ReactDOM.render(<Footer copyrightInfo='Bruno Veiga'/>, container);
+			ReactDOM.render(<Footer copyrightInfo='Bruno Veiga' />, container);
 		});
 	});
 

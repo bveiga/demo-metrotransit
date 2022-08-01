@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import {act} from 'react-dom/test-utils';
 import {fireEvent} from '@testing-library/react';
 import RouteNavigator from './RouteNavigator';
@@ -7,11 +7,11 @@ import RouteNavigator from './RouteNavigator';
 describe('Components | RouteNavigator', () => {
 	let container: HTMLDivElement;
 	let component: Element;
-	
+
 	beforeAll(() => {
 		container = document.createElement('div');
 		document.body.appendChild(container);
-		
+
 		act(() => {
 			ReactDOM.render(<RouteNavigator />, container);
 			component = container.getElementsByClassName('route-navigator')[0];
@@ -27,9 +27,7 @@ describe('Components | RouteNavigator', () => {
 		expect(routeSelectorSection).not.toBeNull();
 	});
 
-	it('renders the stop selector section', () => {
-
-	});
+	it('renders the stop selector section', () => {});
 
 	it('renders the display section', () => {
 		let routeDisplaySection = component.getElementsByClassName('section--display')[0];
@@ -49,7 +47,7 @@ describe('Components | RouteNavigator', () => {
 		let routeSelect = routeSelectContainer.getElementsByTagName('select')[0];
 		let options = routeSelect.getElementsByTagName('option');
 		let middleOptionLabel = options[options.length / 2].value;
-		
+
 		expect(routeSelect.value).not.toBe(middleOptionLabel);
 		fireEvent.change(routeSelect, {target: {value: middleOptionLabel}});
 		expect(routeSelect.value).toBe(middleOptionLabel);
@@ -68,7 +66,7 @@ describe('Components | RouteNavigator', () => {
 		let directionSelect = directionContainer.getElementsByTagName('select')[0];
 		let options = directionSelect.getElementsByTagName('option');
 		let middleOptionLabel = options[options.length / 2].value;
-		
+
 		expect(directionSelect.value).not.toBe(middleOptionLabel);
 		fireEvent.change(directionSelect, {target: {value: middleOptionLabel}});
 		expect(directionSelect.value).toBe(middleOptionLabel);
@@ -82,15 +80,9 @@ describe('Components | RouteNavigator', () => {
 		expect(options.length).toBeGreaterThan(0);
 	});
 
-	it('can select a stop', () => {
-		
-	});
+	it('can select a stop', () => {});
 
-	it('loads new direction tabs when route is selected', () => {
-		
-	});
+	it('loads new direction tabs when route is selected', () => {});
 
-	it('loads new stops when direction is selected', () => {
-		
-	});
+	it('loads new stops when direction is selected', () => {});
 });

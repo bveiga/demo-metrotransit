@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, {FC} from 'react';
 import './Footer.scss';
 
 interface FooterProps {
@@ -6,7 +6,7 @@ interface FooterProps {
 	copyrightInfo: string;
 }
 
-const Footer: FC<FooterProps> = ({ copyrightInfo }) => {
+const Footer: FC<FooterProps> = ({copyrightInfo}) => {
 	return (
 		<footer className='footer'>
 			<div className='content has-text-centered'>
@@ -14,6 +14,6 @@ const Footer: FC<FooterProps> = ({ copyrightInfo }) => {
 			</div>
 		</footer>
 	);
-}
+};
 
 export default Footer;

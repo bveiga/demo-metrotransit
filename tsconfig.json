@@ -4,15 +4,10 @@
 		"jsx": "react",
 		"module": "esnext",
 		"moduleResolution": "node",
-		"lib": [
-			"dom",
-			"esnext"
-		],
+		"lib": ["dom", "esnext"],
 		"strict": true,
 		"sourceMap": true,
-		"target": "es2018",
+		"target": "es2018"
 	},
-	"exclude": [
-		"node_modules"
-	]
+	"exclude": ["node_modules"]
 }

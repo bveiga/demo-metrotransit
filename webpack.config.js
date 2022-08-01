@@ -12,7 +12,7 @@ module.exports = {
 		filename: 'static/js/[name].js',
 		path: path.resolve(__dirname, 'build'),
 		publicPath: '/',
-		clean: true
+		clean: true,
 	},
 	module: {
 		rules: [
@@ -26,21 +26,17 @@ module.exports = {
 			},
 			{
 				test: /\.(scss|sass|css)$/,
-				use: [
-					prod ? MiniCssExtractPlugin.loader : "style-loader" ,
-					'css-loader',
-					'sass-loader'
-				]
+				use: [prod ? MiniCssExtractPlugin.loader : 'style-loader', 'css-loader', 'sass-loader'],
 			},
 			{
 				test: /\.(png|svg|jpg|jpeg|gif)$/i,
 				type: 'asset/resource',
-			}
-		]
+			},
+		],
 	},
 	performance: {
 		maxAssetSize: 500000, // 500 KB
-		maxEntrypointSize: 500000
+		maxEntrypointSize: 500000,
 	},
 	devServer: {
 		historyApiFallback: true,
@@ -49,7 +45,7 @@ module.exports = {
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: 'public/index.html',
-			favicon: 'public/favicon.ico'
+			favicon: 'public/favicon.ico',
 		}),
 		new MiniCssExtractPlugin({
 			filename: 'static/css/[name].css',
