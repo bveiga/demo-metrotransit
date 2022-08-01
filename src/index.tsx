@@ -12,6 +12,7 @@ ReactDOM.render(
 		<BrowserRouter>
             <Switch>
 				<Route path='/' exact component={RouteNavigator} />
+                <Route path='/:route/:direction/:stop' component={RouteNavigator} />
             </Switch>
             <Footer copyrightInfo={`Copyright © ${currentYear} All Rights Reserved | Dev & Design by Bruno Veiga`} />
         </BrowserRouter>

@@ -10,7 +10,8 @@ module.exports = {
 	output: {
 		assetModuleFilename: 'static/media/[name].[ext]',
 		filename: 'static/js/[name].js',
-		path: __dirname + '/build/',
+		path: path.resolve(__dirname, 'build'),
+		publicPath: '/',
 		clean: true
 	},
 	module: {
@@ -40,6 +41,9 @@ module.exports = {
 	performance: {
 		maxAssetSize: 500000, // 500 KB
 		maxEntrypointSize: 500000
+	},
+	devServer: {
+		historyApiFallback: true,
 	},
 	devtool: prod ? undefined : 'source-map',
 	plugins: [

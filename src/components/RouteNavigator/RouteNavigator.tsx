@@ -1,21 +1,19 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { useHistory, useParams } from "react-router-dom";
 import { Activity } from 'react-feather';
 import { TransitDirection, TransitDeparture, TransitRoute, TransitStop } from '../../data/types';
 import './RouteNavigator.scss';
 
-interface RouteNavigatorProps {
-	initialActiveDirection?: string;
-	initialActiveRoute?: string;
-	initialActiveStop?: string;
-	initialActiveTab?: string;
+interface RouteParams {
+	route: string;
+	direction: string;
+	stop: string;
 }
 
-const RouteNavigator: FC<RouteNavigatorProps> = ({
-	initialActiveDirection,
-	initialActiveRoute,
-	initialActiveStop,
-	initialActiveTab
-}) => {
+const RouteNavigator: FC = () => {
+	let history = useHistory();
+	const { route, direction, stop } = useParams<RouteParams>();
+
 	const [activeTab, setActiveTab] = useState(0);
 	const [activeRoute, setActiveRoute] = useState('');
 	const [activeDirection, setActiveDirection] = useState('');
@@ -27,11 +25,18 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 	const [departureList, setDepartureList] = useState([] as TransitDeparture[]);
 	
 	const tabLabels = ['By Route', 'By Stop #'];
-
-	/**
-	 * Fetch Data
-	 */
+	
 	useEffect(() => {
+		// Handle situation where route, direction, and stop are already in the url
+		if(route && direction && stop) {
+			console.log(`Data: ${route}, ${direction}, ${stop}`);
+			fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
+				.then((res) => res.json())
+				.then((data) => {
+					setDepartureList(data.departures);
+				});
+		}
+		
 		fetch("https://svc.metrotransit.org/nextripv2/routes")
 			.then((res) => res.json())
 			.then((data) => {
@@ -39,6 +44,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 			});
 	}, []);
 	
+	/**
+	 * Event Handlers
+	 */
 	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
 		let selectedIndex = evt.target.options.selectedIndex;
 		let selectedRoute = evt.target.options[selectedIndex].getAttribute('data-id') || '';
@@ -46,6 +54,10 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 		fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
 			.then((res) => res.json())
 			.then((data) => {
+				if(history.location.pathname !== '/') {
+					history.push('/');
+				}
+
 				setActiveRoute(selectedRoute);
 				setActiveDirection('');
 				setActiveStop('');
@@ -74,6 +86,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 		fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
 			.then((res) => res.json())
 			.then((data) => {
+				history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
 				setActiveStop(selectedStop);
 				setDepartureList(data.departures);
 			});
@@ -83,6 +96,9 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 		setActiveTab(index);
 	};
 	
+	/**
+	 * Rendering partials
+	 */
 	const renderTabs = (tabLabel: string, index: number): JSX.Element => {
 		const compClasses = (index === activeTab) ? 'tab is-active' : 'tab';
 		return (
@@ -128,7 +144,7 @@ const RouteNavigator: FC<RouteNavigatorProps> = ({
 			<section className='section section--selector'>
 				{!activeTab &&
 					<>
-						<h1 className='title'>Route Selector</h1>
+						<h1 className='title'>Route Selection</h1>
 						<div className='control'>
 							<label>Routes</label>
 							<div className="select container--route">
