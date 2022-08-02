@@ -20,12 +20,13 @@ describe('Components | RouteNavigator', () => {
 		}),
 		rest.get('https://svc.metrotransit.org/nextripv2/Directions/901', (req, res, ctx) => {
 			return res(ctx.json(mockDirectionList))
+		}),
+		rest.get('https://svc.metrotransit.org/nextripv2/Stops/901/0', (req, res, ctx) => {
+			return res(ctx.json(mockStopList))
 		})
 	);
 
-	beforeAll(() => {
-		server.listen();
-
+	beforeEach(() => {
 		container = document.createElement('div');
 		document.body.appendChild(container);
 
@@ -39,7 +40,12 @@ describe('Components | RouteNavigator', () => {
 		});
 	});
 
-	afterEach(() => server.resetHandlers());
+	beforeAll(() => server.listen());
+
+	afterEach(() => {
+		server.resetHandlers();
+		document.body.innerHTML = '';
+	});
 	afterAll(() => server.close());
 
 	it('renders without crashing', () => {
@@ -61,34 +67,46 @@ describe('Components | RouteNavigator', () => {
 		});
 	});
 
-	it('loads directions', async () => {
-		// const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
-		// let firstFetchedDirection = screen.queryByText('Northbound');
-		// expect(firstFetchedDirection).toBeNull();
-
-		// const routeSelector = screen.getByTestId('select__route');
-		// fireEvent.change(routeSelector, { target: { value: '901' } });
-		// firstFetchedDirection = await waitFor(() => getByText(container, 'Northbound'));
-		// expect(firstFetchedDirection).not.toBeNull();
+	it('does not fetch directions until route is selected', async () => {
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		let firstFetchedDirection = screen.queryByText('Northbound');
+		expect(firstFetchedDirection).toBeNull();
 	});
 
-	it('can select a direction', () => {
-		// const directionContainer = component.getElementsByClassName('container--direction')[0];
-		// let directionSelect = directionContainer.getElementsByTagName('select')[0];
-		// let options = directionSelect.getElementsByTagName('option');
-		// let middleOptionLabel = options[options.length / 2].value;
+	it('fetches directions', async () => {
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route');
 
-		// expect(directionSelect.value).not.toBe(middleOptionLabel);
-		// fireEvent.change(directionSelect, {target: {value: middleOptionLabel}});
-		// expect(directionSelect.value).toBe(middleOptionLabel);
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+		const firstFetchedDirection = await waitFor(() => getByText(container, 'Northbound'));
+		expect(firstFetchedDirection).not.toBeNull();
+	});
+
+	it('can select a direction', async () => {
+		// Selecting a route
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
+
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+		await waitFor(() => {
+			expect(routeSelector.value).toBe('901');
+		});
+
+		// Selecting a direction
+		const firstFetchedDirection = await waitFor(() => getByText(container, 'Northbound'));
+		const directionSelector = screen.getByTestId('select__direction') as HTMLSelectElement;
+
+		fireEvent.change(directionSelector, { target: { value: '0' } });
+		await waitFor(() => {
+			expect(directionSelector.value).toBe('0');
+		});
+	});
+
+
+	it('does not fetch stop until direction is selected', async () => {
 	});
 
 	it('loads stops', () => {
-		// const stopContainer = component.getElementsByClassName('container--direction')[0];
-		// let stopSelect = stopContainer.getElementsByTagName('select')[0];
-		// let options = stopSelect.getElementsByTagName('option');
-
-		// expect(options.length).toBeGreaterThan(0);
 	});
 
 	it('can select a stop', () => {});
