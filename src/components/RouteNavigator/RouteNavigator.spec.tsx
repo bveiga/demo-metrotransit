@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import ReactDOM from 'react-dom';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 import { act } from 'react-dom/test-utils';
-import { fireEvent, getByText, screen, waitFor } from '@testing-library/react';
+import { fireEvent, getByText, getAllByText, screen, waitFor, render } from '@testing-library/react';
 
 import 'whatwg-fetch';
 import { rest } from 'msw';
@@ -13,12 +14,16 @@ import { mockDepartureData, mockDirectionList, mockRouteList, mockStopList } fro
 describe('Components | RouteNavigator', () => {
 	let container: HTMLDivElement;
 	let component: Element;
+	const history = createMemoryHistory({ initialEntries: ['/'] });
 
 	const server = setupServer(
 		rest.get('https://svc.metrotransit.org/nextripv2/routes', (req, res, ctx) => {
 			return res(ctx.json(mockRouteList))
 		}),
 		rest.get('https://svc.metrotransit.org/nextripv2/Directions/901', (req, res, ctx) => {
+			return res(ctx.json(mockDirectionList))
+		}),
+		rest.get('https://svc.metrotransit.org/nextripv2/Directions/902', (req, res, ctx) => {
 			return res(ctx.json(mockDirectionList))
 		}),
 		rest.get('https://svc.metrotransit.org/nextripv2/Stops/901/0', (req, res, ctx) => {
@@ -35,9 +40,9 @@ describe('Components | RouteNavigator', () => {
 
 		act(() => {
 			ReactDOM.render(
-				<MemoryRouter>
+				<Router history={history}>
 					<RouteNavigator />
-				</MemoryRouter>
+				</Router>
 			, container);
 			component = container.getElementsByClassName('route-navigator')[0];
 		});
@@ -150,5 +155,44 @@ describe('Components | RouteNavigator', () => {
 		await waitFor(() => {
 			expect(stopSelector.value).toBe('HHTE');
 		});
+	});
+
+	it('renders tabs for the two modes', () => {
+		const tabsList = screen.getByTestId('tabs__list');
+		expect(tabsList).not.toBeNull();
+
+		const firstTab = screen.getByText('By Route');
+		expect(firstTab).not.toBeNull();
+	});
+
+	it('updates history when departures are fetched', async () => {
+		// Selecting a route
+		await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+
+		// Selecting a direction
+		await waitFor(() => getByText(container, 'Northbound'));
+		const directionSelector = screen.getByTestId('select__direction') as HTMLSelectElement;
+		fireEvent.change(directionSelector, { target: { value: '0' } });
+
+		// Selecting a stop
+		await waitFor(() => getByText(container, 'MSP Airport Terminal 2 - Humphrey Station'));
+		const stopSelector = screen.getByTestId('select__stop') as HTMLSelectElement;
+		fireEvent.change(stopSelector, { target: { value: 'HHTE' } });
+
+		// Checking Departure
+		await waitFor(() => getAllByText(container, 'to Mpls-Target Field'));
+		expect(history.location.pathname).toEqual('/901/0/HHTE');
+	});
+
+	it('updates history when route is selected', async () => {
+		expect(history.location.pathname).toEqual('/901/0/HHTE');
+
+		// Selecting a route
+		await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
+		fireEvent.change(routeSelector, { target: { value: '902' } });
+		await waitFor(() => expect(history.location.pathname).toEqual('/'))
 	});
 });

@@ -162,7 +162,7 @@ const RouteNavigator: FC = () => {
 			<section className='section section--tabs'>
 				<div className='tabs is-boxed is-medium'>
 					<label className='sr-only'>Select a method</label>
-					<ul>{tabLabels.map((tabLabel, index) => renderTabs(tabLabel, index))}</ul>
+					<ul data-testid='tabs__list'>{tabLabels.map((tabLabel, index) => renderTabs(tabLabel, index))}</ul>
 				</div>
 			</section>
 			<section className='section section--selector'>
