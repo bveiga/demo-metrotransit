@@ -119,24 +119,25 @@ const RouteNavigator: FC = () => {
 			}
 
 			const data = await result.json();
-					setActiveDirection(selectedDirection);
-					setStopList(data);
+			setActiveDirection(selectedDirection);
+			setStopList(data);
 		}
 	};
 
-	const selectStop = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+	const selectStop = async (evt: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
 		let selectedStop = evt.target.value;
-		console.log(selectedStop);
-
 		if(selectedStop !== '-1') {
-			fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
-				.then((res) => res.json())
-				.then((data) => {
-					history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
-					setActiveStop(selectedStop);
-					setDepartureList(data.departures);
-					setStopData(data.stops[0]);
-				});
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`);
+
+			if (!result.ok) {
+				throw new Error(`selectDirection failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
+			setActiveStop(selectedStop);
+			setDepartureList(data.departures);
+			setStopData(data.stops[0]);
 		}
 	};
 

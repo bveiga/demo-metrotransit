@@ -23,6 +23,9 @@ describe('Components | RouteNavigator', () => {
 		}),
 		rest.get('https://svc.metrotransit.org/nextripv2/Stops/901/0', (req, res, ctx) => {
 			return res(ctx.json(mockStopList))
+		}),
+		rest.get('https://svc.metrotransit.org/nextripv2/901/0/HHTE', (req, res, ctx) => {
+			return res(ctx.json(mockDepartureData))
 		})
 	);
 
@@ -102,16 +105,50 @@ describe('Components | RouteNavigator', () => {
 		});
 	});
 
-
 	it('does not fetch stop until direction is selected', async () => {
+		const firstFetchedStop = screen.queryByText('MSP Airport Terminal 2 - Humphrey Station');
+		expect(firstFetchedStop).toBeNull();
 	});
 
-	it('loads stops', () => {
+	it('fetches stops', async () => {
+		// Selecting a route
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
+
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+		await waitFor(() => {
+			expect(routeSelector.value).toBe('901');
+		});
+
+		// Selecting a direction
+		const directionSelector = screen.getByTestId('select__direction') as HTMLSelectElement;
+		fireEvent.change(directionSelector, { target: { value: '0' } });
+
+		// Checking stops
+		const firstFetchedStop = await waitFor(() => getByText(container, 'MSP Airport Terminal 2 - Humphrey Station'));
+		expect(firstFetchedStop).not.toBeNull();
 	});
 
-	it('can select a stop', () => {});
+	it('can select a stop', async () => {
+		// Selecting a route
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
 
-	it('loads new direction tabs when route is selected', () => {});
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+		await waitFor(() => {
+			expect(routeSelector.value).toBe('901');
+		});
 
-	it('loads new stops when direction is selected', () => {});
+		// Selecting a direction
+		const directionSelector = screen.getByTestId('select__direction') as HTMLSelectElement;
+		fireEvent.change(directionSelector, { target: { value: '0' } });
+
+		// Checking stops
+		const firstFetchedStop = await waitFor(() => getByText(container, 'MSP Airport Terminal 2 - Humphrey Station'));
+		const stopSelector = screen.getByTestId('select__stop') as HTMLSelectElement;
+		fireEvent.change(stopSelector, { target: { value: 'HHTE' } });
+		await waitFor(() => {
+			expect(stopSelector.value).toBe('HHTE');
+		});
+	});
 });
