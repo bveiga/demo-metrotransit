@@ -187,6 +187,7 @@ describe('Components | RouteNavigator', () => {
 	});
 
 	it('updates history when route is selected', async () => {
+		// This test depends on the last test.
 		expect(history.location.pathname).toEqual('/901/0/HHTE');
 
 		// Selecting a route
