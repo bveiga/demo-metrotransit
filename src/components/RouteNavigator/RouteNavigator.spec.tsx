@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
-import { getByText, waitFor } from '@testing-library/react';
+import { fireEvent, getByText, screen, waitFor } from '@testing-library/react';
 
 import 'whatwg-fetch';
 import { rest } from 'msw';
@@ -18,6 +18,9 @@ describe('Components | RouteNavigator', () => {
 		rest.get('https://svc.metrotransit.org/nextripv2/routes', (req, res, ctx) => {
 			return res(ctx.json(mockRouteList))
 		}),
+		rest.get('https://svc.metrotransit.org/nextripv2/Directions/901', (req, res, ctx) => {
+			return res(ctx.json(mockDirectionList))
+		})
 	);
 
 	beforeAll(() => {
@@ -25,48 +28,48 @@ describe('Components | RouteNavigator', () => {
 
 		container = document.createElement('div');
 		document.body.appendChild(container);
+
+		act(() => {
+			ReactDOM.render(
+				<MemoryRouter>
+					<RouteNavigator />
+				</MemoryRouter>
+			, container);
+			component = container.getElementsByClassName('route-navigator')[0];
+		});
 	});
 
 	afterEach(() => server.resetHandlers());
 	afterAll(() => server.close());
 
 	it('renders without crashing', () => {
-		act(() => {
-			ReactDOM.render(
-				<MemoryRouter>
-					<RouteNavigator />
-				</MemoryRouter>
-			, container);
-			component = container.getElementsByClassName('route-navigator')[0];
-		});
-
 		expect(component).not.toBeNull();
 	});
 
 	it('fetches routes on load', async () => {
-		act(() => {
-			ReactDOM.render(
-				<MemoryRouter>
-					<RouteNavigator />
-				</MemoryRouter>
-			, container);
-			component = container.getElementsByClassName('route-navigator')[0];
-		});
-
 		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
 		expect(firstFetchedRoute).not.toBeNull();
 	});
 
 	it('can select a route', async () => {
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		const routeSelector = screen.getByTestId('select__route') as HTMLSelectElement;
 
+		fireEvent.change(routeSelector, { target: { value: '901' } });
+		await waitFor(() => {
+			expect(routeSelector.value).toBe('901');
+		});
 	});
 
-	it('loads directions', () => {
-		// const directionContainer = component.getElementsByClassName('container--direction')[0];
-		// let directionSelect = directionContainer.getElementsByTagName('select')[0];
-		// let options = directionSelect.getElementsByTagName('option');
+	it('loads directions', async () => {
+		// const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		// let firstFetchedDirection = screen.queryByText('Northbound');
+		// expect(firstFetchedDirection).toBeNull();
 
-		// expect(options.length).toBeGreaterThan(0);
+		// const routeSelector = screen.getByTestId('select__route');
+		// fireEvent.change(routeSelector, { target: { value: '901' } });
+		// firstFetchedDirection = await waitFor(() => getByText(container, 'Northbound'));
+		// expect(firstFetchedDirection).not.toBeNull();
 	});
 
 	it('can select a direction', () => {

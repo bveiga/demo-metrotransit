@@ -86,23 +86,26 @@ const RouteNavigator: FC = () => {
 	/**
 	 * Event Handlers
 	 */
-	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+	const selectRoute = async (evt: React.ChangeEvent<HTMLSelectElement>) => {
 		let selectedRoute = evt.target.value;
 		if(selectedRoute !== '-1') {
-			fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
-				.then((res) => res.json())
-				.then((data) => {
-					if (history.location.pathname !== '/') {
-						history.push('/');
-					}
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`);
 
-					setActiveRoute(selectedRoute);
-					setActiveDirection('-1');
-					setActiveStop('-1');
-					setDirectionList(data);
-					setDepartureList([]);
-					setStopList([]);
-				});
+			if (!result.ok) {
+				throw new Error(`selectRoute failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			if (history.location.pathname !== '/') {
+				history.push('/');
+			}
+
+			setActiveRoute(selectedRoute);
+			setActiveDirection('-1');
+			setActiveStop('-1');
+			setDirectionList(data);
+			setDepartureList([]);
+			setStopList([]);
 		}
 	};
 
@@ -165,7 +168,7 @@ const RouteNavigator: FC = () => {
 						<div className='control'>
 							<label>Routes</label>
 							<div className='select'>
-								<select className='select__route' onChange={selectRoute} value={activeRoute}>
+								<select className='select__route' data-testid='select__route' onChange={selectRoute} value={activeRoute}>
 									<option key={0} value='-1'>Select a Route</option>
 									{routeList.map((route) => {
 										return (
@@ -181,7 +184,7 @@ const RouteNavigator: FC = () => {
 							<div className='control'>
 								<label>Directions</label>
 								<div className='select'>
-									<select className='select__direction' onChange={selectDirection} value={activeDirection}>
+									<select className='select__direction' data-testid='select__direction' onChange={selectDirection} value={activeDirection}>
 										<option key={0} value='-1'>Select a Direction</option>
 										{directionList.map((direction) => {
 											return (
@@ -198,7 +201,7 @@ const RouteNavigator: FC = () => {
 							<div className='control'>
 								<label>Stops</label>
 								<div className='select'>
-									<select className='select__stop' onChange={selectStop} value={activeStop}>
+									<select className='select__stop' data-testid='select__stop' onChange={selectStop} value={activeStop}>
 										<option key={0} value='-1'>Select a Stop</option>
 										{stopList.map((stop) => {
 											return (
