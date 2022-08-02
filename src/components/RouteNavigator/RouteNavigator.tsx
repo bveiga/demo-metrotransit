@@ -28,7 +28,8 @@ const RouteNavigator: FC = () => {
 	const tabLabels = ['By Route', 'By Stop #'];
 
 	useEffect(() => {
-		initialFetches();
+		fetchRoutes();
+		fetchDepartures();
 
 		// Handle back and forward buttons
 		return history.listen((location) => {
@@ -43,37 +44,43 @@ const RouteNavigator: FC = () => {
 					route = paramsArray[1];
 					direction = paramsArray[2];
 					stop = paramsArray[3];
+					fetchDepartures();
 				}
-				initialFetches();
 			}
 		});
 	}, [history]);
 
-	const initialFetches = async () => {
-		// Handle situation where route, direction, and stop are already in the url
+	const fetchDepartures = async () => {
 		if (route && direction && stop) {
-			console.log(`Data: ${route}, ${direction}, ${stop}`);
-			await fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
-				.then((res) => res.json())
-				.then((data) => {
-					setActiveRoute('-1');
-					setActiveStop(stop);
-					setDirectionList([]);
-					setStopList([]);
-					setDepartureList(data.departures);
-					setStopData(data.stops[0]);
-				});
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`);
+
+			if (!result.ok) {
+				throw new Error(`fetchDepartures failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			setActiveRoute('-1');
+			setActiveStop(stop);
+			setDirectionList([]);
+			setStopList([]);
+			setDepartureList(data.departures);
+			setStopData(data.stops[0]);
 		} else {
 			setActiveRoute('-1');
 			setActiveDirection('-1');
 			setActiveStop('-1');
 		}
+	};
 
-		await fetch('https://svc.metrotransit.org/nextripv2/routes')
-			.then((res) => res.json())
-			.then((data) => {
-				setRouteList(data);
-			});
+	const fetchRoutes = async () => {
+		const result = await fetch(`https://svc.metrotransit.org/nextripv2/routes`);
+
+		if (!result.ok) {
+			throw new Error(`fetchRoutes failed with status code: ${result.status}`);
+		}
+
+		const data = await result.json();
+		setRouteList(data);
 	};
 
 	/**

@@ -1,52 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MemoryRouter } from 'react-router-dom';
-import {act} from 'react-dom/test-utils';
-import RouteNavigator from './RouteNavigator';
-import nock from 'nock';
+import { act } from 'react-dom/test-utils';
+import { getByText, waitFor } from '@testing-library/react';
+
 import 'whatwg-fetch';
+import { rest } from 'msw';
+import  { setupServer } from 'msw/node';
+import RouteNavigator from './RouteNavigator';
 import { mockDepartureData, mockDirectionList, mockRouteList, mockStopList } from '../../data/mockData';
 
 describe('Components | RouteNavigator', () => {
 	let container: HTMLDivElement;
 	let component: Element;
-	let routeFetch: nock.Scope;
-	let directionFetch: nock.Scope;
-	let stopFetch: nock.Scope;
-	let departureFetch: nock.Scope;
+
+	const server = setupServer(
+		rest.get('https://svc.metrotransit.org/nextripv2/routes', (req, res, ctx) => {
+			return res(ctx.json(mockRouteList))
+		}),
+	);
 
 	beforeAll(() => {
-		routeFetch = nock('https://svc.metrotransit.org')
-			.get('/nextripv2/routes')
-			.once()
-			.reply(200, {
-				data: mockRouteList,
-			});
-
-		directionFetch = nock('https://svc.metrotransit.org')
-			.get('/nextripv2/Directions/901')
-			.once()
-			.reply(200, {
-				data: mockStopList,
-			});
-
-		stopFetch = nock('https://svc.metrotransit.org')
-			.get('/nextripv2/Stops/901/0')
-			.once()
-			.reply(200, {
-				data: mockStopList,
-			});
-
-		departureFetch = nock('https://svc.metrotransit.org')
-			.get('/nextripv2/901/0/HHTE')
-			.once()
-			.reply(200, {
-				data: mockDepartureData,
-			});
+		server.listen();
 
 		container = document.createElement('div');
 		document.body.appendChild(container);
+	});
 
+	afterEach(() => server.resetHandlers());
+	afterAll(() => server.close());
+
+	it('renders without crashing', () => {
 		act(() => {
 			ReactDOM.render(
 				<MemoryRouter>
@@ -55,25 +39,26 @@ describe('Components | RouteNavigator', () => {
 			, container);
 			component = container.getElementsByClassName('route-navigator')[0];
 		});
-	});
 
-	it('renders without crashing', () => {
 		expect(component).not.toBeNull();
 	});
 
-	it('loads routes', async () => {
+	it('fetches routes on load', async () => {
+		act(() => {
+			ReactDOM.render(
+				<MemoryRouter>
+					<RouteNavigator />
+				</MemoryRouter>
+			, container);
+			component = container.getElementsByClassName('route-navigator')[0];
+		});
 
+		const firstFetchedRoute = await waitFor(() => getByText(container, 'METRO Blue Line'));
+		expect(firstFetchedRoute).not.toBeNull();
 	});
 
-	it('can select a route', () => {
-		// const routeSelectContainer = component.getElementsByClassName('container--route')[0];
-		// let routeSelect = routeSelectContainer.getElementsByTagName('select')[0];
-		// let options = routeSelect.getElementsByTagName('option');
-		// let middleOptionLabel = options[options.length / 2].value;
+	it('can select a route', async () => {
 
-		// expect(routeSelect.value).not.toBe(middleOptionLabel);
-		// fireEvent.change(routeSelect, {target: {value: middleOptionLabel}});
-		// expect(routeSelect.value).toBe(middleOptionLabel);
 	});
 
 	it('loads directions', () => {
