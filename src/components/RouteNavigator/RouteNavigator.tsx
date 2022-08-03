@@ -28,7 +28,8 @@ const RouteNavigator: FC = () => {
 	const tabLabels = ['By Route', 'By Stop #'];
 
 	useEffect(() => {
-		initialFetches();
+		fetchRoutes();
+		fetchDepartures();
 
 		// Handle back and forward buttons
 		return history.listen((location) => {
@@ -43,87 +44,100 @@ const RouteNavigator: FC = () => {
 					route = paramsArray[1];
 					direction = paramsArray[2];
 					stop = paramsArray[3];
+					fetchDepartures();
 				}
-				initialFetches();
 			}
 		});
 	}, [history]);
 
-	const initialFetches = async () => {
-		// Handle situation where route, direction, and stop are already in the url
+	const fetchDepartures = async () => {
 		if (route && direction && stop) {
-			console.log(`Data: ${route}, ${direction}, ${stop}`);
-			await fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`)
-				.then((res) => res.json())
-				.then((data) => {
-					setActiveRoute('-1');
-					setActiveStop(stop);
-					setDirectionList([]);
-					setStopList([]);
-					setDepartureList(data.departures);
-					setStopData(data.stops[0]);
-				});
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/${route}/${direction}/${stop}`);
+
+			if (!result.ok) {
+				throw new Error(`fetchDepartures failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			setActiveRoute('-1');
+			setActiveStop(stop);
+			setDirectionList([]);
+			setStopList([]);
+			setDepartureList(data.departures);
+			setStopData(data.stops[0]);
 		} else {
 			setActiveRoute('-1');
 			setActiveDirection('-1');
 			setActiveStop('-1');
 		}
+	};
 
-		await fetch('https://svc.metrotransit.org/nextripv2/routes')
-			.then((res) => res.json())
-			.then((data) => {
-				setRouteList(data);
-			});
+	const fetchRoutes = async () => {
+		const result = await fetch(`https://svc.metrotransit.org/nextripv2/routes`);
+
+		if (!result.ok) {
+			throw new Error(`fetchRoutes failed with status code: ${result.status}`);
+		}
+
+		const data = await result.json();
+		setRouteList(data);
 	};
 
 	/**
 	 * Event Handlers
 	 */
-	const selectRoute = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+	const selectRoute = async (evt: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
 		let selectedRoute = evt.target.value;
 		if(selectedRoute !== '-1') {
-			fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`)
-				.then((res) => res.json())
-				.then((data) => {
-					if (history.location.pathname !== '/') {
-						history.push('/');
-					}
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/Directions/${selectedRoute}`);
 
-					setActiveRoute(selectedRoute);
-					setActiveDirection('-1');
-					setActiveStop('-1');
-					setDirectionList(data);
-					setDepartureList([]);
-					setStopList([]);
-				});
+			if (!result.ok) {
+				throw new Error(`selectRoute failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			if (history.location.pathname !== '/') {
+				history.push('/');
+			}
+
+			setActiveRoute(selectedRoute);
+			setActiveDirection('-1');
+			setActiveStop('-1');
+			setDirectionList(data);
+			setDepartureList([]);
+			setStopList([]);
 		}
 	};
 
-	const selectDirection = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+	const selectDirection = async (evt: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
 		let selectedDirection = evt.target.value;
 		if(selectedDirection !== '-1') {
-			fetch(`https://svc.metrotransit.org/nextripv2/Stops/${activeRoute}/${selectedDirection}`)
-				.then((res) => res.json())
-				.then((data) => {
-					setActiveDirection(selectedDirection);
-					setStopList(data);
-				});
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/Stops/${activeRoute}/${selectedDirection}`);
+
+			if (!result.ok) {
+				throw new Error(`selectDirection failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			setActiveDirection(selectedDirection);
+			setStopList(data);
 		}
 	};
 
-	const selectStop = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
+	const selectStop = async (evt: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
 		let selectedStop = evt.target.value;
-		console.log(selectedStop);
-
 		if(selectedStop !== '-1') {
-			fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`)
-				.then((res) => res.json())
-				.then((data) => {
-					history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
-					setActiveStop(selectedStop);
-					setDepartureList(data.departures);
-					setStopData(data.stops[0]);
-				});
+			const result = await fetch(`https://svc.metrotransit.org/nextripv2/${activeRoute}/${activeDirection}/${selectedStop}`);
+
+			if (!result.ok) {
+				throw new Error(`selectDirection failed with status code: ${result.status}`);
+			}
+
+			const data = await result.json();
+			history.push(`/${activeRoute}/${activeDirection}/${selectedStop}`);
+			setActiveStop(selectedStop);
+			setDepartureList(data.departures);
+			setStopData(data.stops[0]);
 		}
 	};
 
@@ -148,7 +162,7 @@ const RouteNavigator: FC = () => {
 			<section className='section section--tabs'>
 				<div className='tabs is-boxed is-medium'>
 					<label className='sr-only'>Select a method</label>
-					<ul>{tabLabels.map((tabLabel, index) => renderTabs(tabLabel, index))}</ul>
+					<ul data-testid='tabs__list'>{tabLabels.map((tabLabel, index) => renderTabs(tabLabel, index))}</ul>
 				</div>
 			</section>
 			<section className='section section--selector'>
@@ -158,7 +172,7 @@ const RouteNavigator: FC = () => {
 						<div className='control'>
 							<label>Routes</label>
 							<div className='select'>
-								<select className='select__route' onChange={selectRoute} value={activeRoute}>
+								<select className='select__route' data-testid='select__route' onChange={selectRoute} value={activeRoute}>
 									<option key={0} value='-1'>Select a Route</option>
 									{routeList.map((route) => {
 										return (
@@ -174,7 +188,7 @@ const RouteNavigator: FC = () => {
 							<div className='control'>
 								<label>Directions</label>
 								<div className='select'>
-									<select className='select__direction' onChange={selectDirection} value={activeDirection}>
+									<select className='select__direction' data-testid='select__direction' onChange={selectDirection} value={activeDirection}>
 										<option key={0} value='-1'>Select a Direction</option>
 										{directionList.map((direction) => {
 											return (
@@ -191,7 +205,7 @@ const RouteNavigator: FC = () => {
 							<div className='control'>
 								<label>Stops</label>
 								<div className='select'>
-									<select className='select__stop' onChange={selectStop} value={activeStop}>
+									<select className='select__stop' data-testid='select__stop' onChange={selectStop} value={activeStop}>
 										<option key={0} value='-1'>Select a Stop</option>
 										{stopList.map((stop) => {
 											return (
